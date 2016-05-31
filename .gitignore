@@ -1,0 +1,5 @@
+*/data/
+*/secrets.env
+
+# Vim
+*.swp
