@@ -10,12 +10,15 @@ services:
       - ./data/node0:/var/lib/mysql
       - ./conf.d:/etc/mysql/conf.d
     command: ['--wsrep-new-cluster']
-#  node1:
-#    build: .
-#    extends:
-#      service: node0
-#    container_name: mariadb-node-1
-#    volumes:
-#      - ./data/node1:/var/lib/mysql
-#      - ./conf.d:/etc/mysql/conf.d
-#
+  node1:
+    extends:
+      service: node0
+    container_name: mariadb-node-1
+    volumes:
+      - ./data/node1:/var/lib/mysql
+      - ./conf.d:/etc/mysql/conf.d
+      - ./wait4mysql.sh:/usr/local/bin/wait4mysql.sh
+    entrypoint:
+      - wait4mysql.sh
+      - mariadb-node-0
+      - docker-entrypoint.sh
