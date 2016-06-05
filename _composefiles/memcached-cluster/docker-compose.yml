@@ -7,7 +7,7 @@ services:
     extends: memcached1
     container_name: memcached-node2
   mcrouter:
-    image: mcrouter
+    image: m3adow/mcrouter:latest
     depends_on:
       - memcached1
       - memcached2
