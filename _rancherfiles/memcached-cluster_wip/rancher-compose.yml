@@ -1,0 +1,8 @@
+memcached:
+  scale: 2
+mcrouter:
+  scale: 2
+lb:
+  scale: 2
+  load_balancer_config:
+    name: lb config

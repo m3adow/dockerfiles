@@ -1,0 +1,15 @@
+memcached:
+  image: memcached:latest
+  labels:
+    io.rancher.container.hostname_override: container_name
+mcrouter:
+  image: m3adow/mcrouter:latest
+  command: mcrouter --config-str='{"pools":{"A":{"servers":["memcached-node1:11211","memcached-node2:11211"]}},"route":"PoolRoute|A"}' -a /tmp/ -p 5000
+  labels:
+    io.rancher.container.hostname_override: container_name
+lb:
+  image: rancher/load-balancer-service
+  links:
+    - mcrouter
+  expose:
+    - 5000:5000
