@@ -30,3 +30,5 @@ RUN cd /usr/local/bin \
   && chmod +x gosu \
   && rm -f sha256sum \
   && apk --no-cache --purge del curl
+
+ENTRYPOINT ["/usr/local/bin/dumb-init"]
