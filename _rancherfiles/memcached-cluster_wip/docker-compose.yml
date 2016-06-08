@@ -1,11 +1,13 @@
 memcached:
   image: memcached:latest
   labels:
+    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
     io.rancher.container.hostname_override: container_name
 mcrouter:
   image: m3adow/mcrouter:latest
   command: mcrouter --config-str='{"pools":{"A":{"servers":["memcached-node1:11211","memcached-node2:11211"]}},"route":"PoolRoute|A"}' -a /tmp/ -p 5000
   labels:
+    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
     io.rancher.container.hostname_override: container_name
 lb:
   image: rancher/load-balancer-service
@@ -13,3 +15,6 @@ lb:
     - mcrouter
   expose:
     - 5000:5000
+  labels:
+    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+    io.rancher.container.hostname_override: container_name
