@@ -1,10 +1,9 @@
-FROM m3adow/ubuntu_dumb-init_gosu:latest
+FROM m3adow/alpine_dumb-init_gosu
 MAINTAINER Till Wiese <mail-github.com@till-wiese.de>
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-  && apt-get install -y python2.7 libpython2.7 python-mysqldb \
-      python-setuptools python-imaging python-ldap sqlite3 \
-      python-memcache curl
+RUN apk add --no-cache curl python py-pip py-imaging py-mysqldb sqlite \
+    gcc python-dev musl-dev openldap-dev bash \ 
+  && pip install python-memcached python-ldap # pil-compat
 
 RUN mkdir -p /srv/seafile/conf \
   && curl -sL $(curl -sL https://www.seafile.com/en/download/ \
