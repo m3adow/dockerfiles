@@ -29,4 +29,4 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get purge -y curl ca-certificates \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/log/*
 
-ENTRYPOINT ['/usr/bin/dumb-init']
+ENTRYPOINT ["/usr/bin/dumb-init"]
