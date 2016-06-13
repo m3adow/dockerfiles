@@ -19,12 +19,25 @@ validate_vars() {
 }
 
 run_seafile() {
+  # Needed to check the return code
+  set +e
   ${INSTALLPATH}/seafile.sh start
+  local RET=$?
+  # Try an initial setup on error
+  if [ ${RET} -eq 255 ]
+  then
+    setup_sqlite
+  elif [ ${RET} -gt 0 ]
+  then
+    exit 255
+  fi
+  set -e
   ${INSTALLPATH}/seahub.sh start
+  keep_in_foreground
 }
 
 setup_mysql() {
-  echo "setup_mysql"
+  echo "setup_mysql is ongoing."
 }
 
 setup_sqlite() {
@@ -60,6 +73,22 @@ setup_seahub() {
 
   python ${INSTALLPATH}/check_init_admin.py
 
+}
+
+keep_in_foreground() {
+# As there seems to be no way to let Seafile processes run in the foreground we 
+# need a foreground process. This has a dual use as a supervisor script because 
+# as soon as one process is not running, the command returns an exit code >0 
+# leading to a script abortion thanks to "set -e".
+while true
+do
+  for SEAFILE_PROC in "seafile-controller" "ccnet-server" "seaf-server" "gunicorn"
+  do
+    ps -ef | grep -v "grep" | grep -q "${SEAFILE_PROC}"
+    sleep 1
+  done
+  sleep 5
+done
 }
 
 
