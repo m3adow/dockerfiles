@@ -1,6 +1,6 @@
 SEAFILE_NAME=Seafile
 SEAFILE_ADDRESS=seafile.local
-SEAFILE_ADMIN=admin@adminswerk.de
+SEAFILE_ADMIN=mail-github.com@adminswerk.de
 SEAFILE_ADMIN_PW=LoremIpsum
 
 MYSQL_SERVER=172.17.0.1
