@@ -8,18 +8,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
-RUN useradd -b /seafile -M -s /bin/bash -c "Seafile User" seafile \
-  && mkdir -p /opt/haiwen \
+RUN useradd -d /seafile -M -s /bin/bash -c "Seafile User" seafile \
+  && mkdir -p /opt/haiwen /seafile/ \
   && curl -sL $(curl -sL https://www.seafile.com/en/download/ \
     | grep -oE 'https://.*seafile-server.*x86-64.tar.gz'|sort -r|head -1) \
     | tar -C /opt/haiwen/ -xz \
-  && mkdir -p /seafile/conf /seafile/seafile-data \
-    /seafile/seahub-data \
-  && ln -s /seafile/conf /opt/haiwen/conf \
-  && ln -s /seafile/seafile-data /opt/haiwen/seafile-data \
-  && ln -s /seafile/seahub-data /opt/haiwen/seahub-data \
-  && ln -s /opt/haiwen/$(ls -1 /opt/haiwen/ \
-    | grep -E '^seafile-server-[0-9.-]+') /opt/haiwen/seafile-server-latest \
   && chown -R seafile:seafile /seafile /opt/haiwen
 
 USER seafile
