@@ -8,18 +8,14 @@ DATADIR=${DATADIR:-"/seafile"}
 BASEPATH=${BASEPATH:-"/opt/haiwen"}
 INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1 ${BASEPATH} | grep -E '^seafile-server-[0-9.-]+')"}
 
-validate_vars() {
-  for VAR in "$@"
-  do
-    if [ -z "$VAR" ]
-    then
-      echo "Missing variable value"
-      exit 1
-    fi
-  done
+trapped() {
+# todo:
+# stop seahub/seafile before move_dirs_and link
+# Utilize this trap to properly stop seafile and seahub before exiting
 }
 
 run_seafile() {
+  move_dirs_and_link
   # Needed to check the return code
   set +e
   ${INSTALLPATH}/seafile.sh start
@@ -49,8 +45,7 @@ setup_mysql() {
   echo "setup_mysql"
 
   set +u
-  OPTIONAL_PARMS="$([ -n "${MYSQL_ROOT_PASSWORD}" ] && printf '%s' "-r ${MYSQL_ROOT_PASSWORD}") \
-                  $([ -n "${MYSQL_USER_HOST}" ] && printf '%s' "-q ${MYSQL_USER_HOST}")"
+  OPTIONAL_PARMS="$([ -n "${MYSQL_ROOT_PASSWORD}" ] && printf '%s' "-r ${MYSQL_ROOT_PASSWORD}")"
   set -u
 
   ${INSTALLPATH}/setup-seafile-mysql.sh auto \
@@ -62,6 +57,7 @@ setup_mysql() {
     -t "${MYSQL_PORT:-3306}" \
     -u "${MYSQL_USER}" \
     -w "${MYSQL_USER_PASSWORD}" \
+    -q "${MYSQL_USER_HOST:-"%"}" \
     ${OPTIONAL_PARMS}
 
   setup_seahub
@@ -108,7 +104,11 @@ move_dirs_and_link() {
   do
     if [ -e "${BASEPATH}/${SEADIR}" ]
     then
-      mv ${BASEPATH}/${SEADIR} ${DATADIR} 
+      cp -a ${BASEPATH}/${SEADIR} ${DATADIR}
+      rm -rf {BASEPATH}/${SEADIR}
+    fi
+    if [ -e "${DATADIR}/${SEADIR}" ]
+    then
       ln -s ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
   done
