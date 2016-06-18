@@ -4,7 +4,7 @@ MAINTAINER Till Wiese <mail-github.com@till-wiese.de>
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
   && apt-get install -y python2.7 libpython2.7 python-mysqldb \
       python-setuptools python-imaging python-ldap sqlite3 \
-      python-memcache curl vim \
+      python-memcache curl \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
