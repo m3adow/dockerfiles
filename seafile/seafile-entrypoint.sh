@@ -9,13 +9,13 @@ BASEPATH=${BASEPATH:-"/opt/haiwen"}
 INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1 ${BASEPATH} | grep -E '^seafile-server-[0-9.-]+')"}
 
 trapped() {
-# todo:
-# stop seahub/seafile before move_dirs_and link
-# Utilize this trap to properly stop seafile and seahub before exiting
+  ${INSTALLPATH}/seafile.sh stop
+  ${INSTALLPATH}/seahub.sh stop
 }
 
 run_seafile() {
-  move_dirs_and_link
+  # If there's an existing seafile config, link the dirs
+  move_and_link
   # Needed to check the return code
   set +e
   ${INSTALLPATH}/seafile.sh start
@@ -30,8 +30,10 @@ run_seafile() {
     if [ -n "${MYSQL_SERVER}" ]
     then
       setup_mysql
+      ${INSTALLPATH}/seafile.sh start
     else
       setup_sqlite
+      ${INSTALLPATH}/seafile.sh start
     fi
   elif [ ${RET} -gt 0 ]
   then
@@ -61,8 +63,7 @@ setup_mysql() {
     ${OPTIONAL_PARMS}
 
   setup_seahub
-  move_dirs_and_link
-
+  move_and_link
 }
 
 setup_sqlite() {
@@ -75,7 +76,7 @@ setup_sqlite() {
     -d "${SEAFILE_DATA_DIR}"
 
   setup_seahub
-  move_dirs_and_link
+  move_and_link
 }
 
 setup_seahub() {
@@ -96,22 +97,38 @@ setup_seahub() {
   ${INSTALLPATH}/seafile.sh start
 
   python ${INSTALLPATH}/check_init_admin.py
-
 }
 
-move_dirs_and_link() {
+move_and_link() {
+  # Stop Seafile/hub instances if running
+  ${INSTALLPATH}/seahub.sh stop
+  ${INSTALLPATH}/seafile.sh stop
+
   for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data" 
   do
     if [ -e "${BASEPATH}/${SEADIR}" ]
     then
       cp -a ${BASEPATH}/${SEADIR} ${DATADIR}
-      rm -rf {BASEPATH}/${SEADIR}
+      rm -rf "${BASEPATH}/${SEADIR}"
     fi
     if [ -e "${DATADIR}/${SEADIR}" ]
     then
       ln -s ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
   done
+
+  # Do also move/link the seahub.db
+  # As this is normally in the root dir of seafile (/opt/haiwen)
+  # SEAHUB_DB_DIR needs to be defined if it should be moved elsewhere under /seafile
+  local SH_DB_DIR="${DATADIR}/${SEAHUB_DB_DIR}"
+  if [ -e "${BASEPATH}/seahub.db" ]
+  then
+    mv ${BASEPATH}/seahub.db ${SH_DB_DIR}/
+  fi
+  if [ -e "${SH_DB_DIR}/seahub.db" ]
+  then
+    ln -s ${SH_DB_DIR}/seahub.sh ${BASEPATH}/seahub.db
+  fi
 }
 
 keep_in_foreground() {
@@ -145,8 +162,10 @@ MODE=${MODE:-"run"}
 
 SEAFILE_DATA_DIR=${SEAFILE_DATA_DIR:-"${DATADIR}/seafile-data"}
 SEAFILE_PORT=${SEAFILE_PORT:-8082}
+SEAHUB_DB_DIR=${SEAHUB_DB_DIR:-}
 
 
+trap trapped SIGINT SIGTERM
 case $MODE in
   "run")
     run_seafile
