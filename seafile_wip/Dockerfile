@@ -1,10 +1,24 @@
-FROM m3adow:alpine_dumb-init_gosu
+FROM m3adow/ubuntu_dumb-init_gosu:latest
 MAINTAINER Till Wiese <mail-github.com@till-wiese.de>
 
-RUN apk add --no-cache curl python py-pip \
-  && pip install python-memcached python-ldap PIL
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+  && apt-get install -y python2.7 libpython2.7 python-mysqldb \
+      python-setuptools python-imaging python-ldap sqlite3 \
+      python-memcache curl \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN mkdir -p /srv/seafile \
+
+RUN useradd -d /seafile -M -s /bin/bash -c "Seafile User" seafile \
+  && mkdir -p /opt/haiwen /seafile/ \
   && curl -sL $(curl -sL https://www.seafile.com/en/download/ \
     | grep -oE 'https://.*seafile-server.*x86-64.tar.gz'|sort -r|head -1) \
-    | tar -C /tmp -xz
+    | tar -C /opt/haiwen/ -xz \
+  && chown -R seafile:seafile /seafile /opt/haiwen
+
+USER seafile
+
+COPY ["seafile-entrypoint.sh", "/usr/local/bin/"]
+
+EXPOSE 8000 8082
+
+ENTRYPOINT ["/usr/bin/dumb-init", "/usr/local/bin/seafile-entrypoint.sh"]
