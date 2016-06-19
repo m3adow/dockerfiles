@@ -2,7 +2,6 @@
 set -e
 set -u
 set -o pipefail
-set -x
 
 DATADIR=${DATADIR:-"/seafile"}
 BASEPATH=${BASEPATH:-"/opt/haiwen"}
