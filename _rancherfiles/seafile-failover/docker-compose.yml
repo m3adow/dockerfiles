@@ -1,7 +1,13 @@
 seafile:
-  name: seafile
+  container_name: seafile
   image: m3adow/seafile
   volumes:
-  - cloud-data:/seafile
+    - cloud-data:/seafile
   volume_driver: convoy-gluster
+  labels:
+    io.rancher.container.hostname_overridexi: container_name
+  env_file: secrets.env
+
+  links:
+    - galera-lb:mysql
 
