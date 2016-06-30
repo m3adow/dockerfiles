@@ -110,7 +110,9 @@ move_and_link() {
       cp -a ${BASEPATH}/${SEADIR} ${DATADIR}
       rm -rf "${BASEPATH}/${SEADIR}"
     fi
-    if [ -e "${DATADIR}/${SEADIR}" ]
+    # If there's content in the dirs (=existing config)
+    # do a link
+    if [ "$(ls -A ${DATADIR}/${SEADIR})" ]
     then
       ln -s ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
