@@ -126,7 +126,7 @@ move_and_link() {
   fi
   if [ -e "${SH_DB_DIR}/seahub.db" ]
   then
-    ln -s ${SH_DB_DIR}/seahub.sh ${BASEPATH}/seahub.db
+    ln -s ${SH_DB_DIR}/seahub.db ${BASEPATH}/seahub.db
   fi
 }
 
