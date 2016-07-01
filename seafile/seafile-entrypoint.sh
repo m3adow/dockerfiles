@@ -105,6 +105,8 @@ move_and_link() {
     fi
     if [ -e "${DATADIR}/${SEADIR}" ]
     then
+      ls -ld ${DATADIR}/${SEADIR}
+      ls -lA ${DATADIR}/${SEADIR}
       ln -s ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
   done
