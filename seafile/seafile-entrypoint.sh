@@ -125,6 +125,7 @@ move_and_link() {
 }
 
 keep_in_foreground() {
+  # todo: pkill > ps -ef |grep
   # As there seems to be no way to let Seafile processes run in the foreground we 
   # need a foreground process. This has a dual use as a supervisor script because 
   # as soon as one process is not running, the command returns an exit code >0 
@@ -153,11 +154,17 @@ _EOF_
 }
 
 control_seafile() {
-  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seafile.sh "$@"; sleep 1"
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seafile.sh "$@""
+  local RET=$?
+  sleep 1
+  return ${RET}
 }
 
 control_seahub() {
-  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seahub.sh "$@"; sleep 1"
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seahub.sh "$@""
+  local RET=$?
+  sleep 1
+  return ${RET}
 }
 
 
