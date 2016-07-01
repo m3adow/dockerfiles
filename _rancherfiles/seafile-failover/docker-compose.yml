@@ -1,0 +1,11 @@
+seafile:
+  image: m3adow/seafile:dev
+  env_file:
+  - ./secrets.env
+  volumes:
+    - cloud-data:/seafile
+  volume_driver: convoy-gluster
+  external_links:
+  - 'galera/galera-lb:mysql'
+  labels:
+    io.rancher.container.hostname_override: container_name
