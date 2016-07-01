@@ -141,7 +141,7 @@ keep_in_foreground() {
 }
 
 prepare_env() {
-  cat << _EOF_ >> /tmp/seafile.env
+  cat << _EOF_ > /tmp/seafile.env
   export LANG='en_US.UTF-8'
   export LC_ALL='en_US.UTF-8'
   export CCNET_CONF_DIR="${BASEPATH}/ccnet"
@@ -153,11 +153,11 @@ _EOF_
 }
 
 control_seafile() {
-  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seafile.sh "$@""
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seafile.sh "$@"; sleep 1"
 }
 
 control_seahub() {
-  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seahub.sh "$@""
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seahub.sh "$@"; sleep 1"
 }
 
 
