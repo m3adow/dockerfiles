@@ -15,8 +15,6 @@ RUN useradd -d /seafile -M -s /bin/bash -c "Seafile User" seafile \
     | tar -C /opt/haiwen/ -xz \
   && chown -R seafile:seafile /seafile /opt/haiwen
 
-USER seafile
-
 COPY ["seafile-entrypoint.sh", "/usr/local/bin/"]
 
 EXPOSE 8000 8082

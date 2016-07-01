@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 set -e
 set -u
 set -o pipefail
@@ -8,8 +9,8 @@ BASEPATH=${BASEPATH:-"/opt/haiwen"}
 INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1 ${BASEPATH} | grep -E '^seafile-server-[0-9.-]+')"}
 
 trapped() {
-  ${INSTALLPATH}/seafile.sh stop
-  ${INSTALLPATH}/seahub.sh stop
+  control_seahub "stop"
+  control_seafile "stop"
 }
 
 run_seafile() {
@@ -17,7 +18,7 @@ run_seafile() {
   move_and_link
   # Needed to check the return code
   set +e
-  ${INSTALLPATH}/seafile.sh start
+  control_seafile "start"
   local RET=$?
   set -e
   # Try an initial setup on error
@@ -29,16 +30,16 @@ run_seafile() {
     if [ -n "${MYSQL_SERVER}" ]
     then
       setup_mysql
-      ${INSTALLPATH}/seafile.sh start
+      control_seafile "start"
     else
       setup_sqlite
-      ${INSTALLPATH}/seafile.sh start
+      control_seafile "start"
     fi
   elif [ ${RET} -gt 0 ]
   then
     exit 1
   fi
-  ${INSTALLPATH}/seahub.sh start
+  control_seahub "start"
   keep_in_foreground
 }
 
@@ -49,7 +50,7 @@ setup_mysql() {
   OPTIONAL_PARMS="$([ -n "${MYSQL_ROOT_PASSWORD}" ] && printf '%s' "-r ${MYSQL_ROOT_PASSWORD}")"
   set -u
 
-  ${INSTALLPATH}/setup-seafile-mysql.sh auto \
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/setup-seafile-mysql.sh auto \
     -n "${SEAFILE_NAME}" \
     -i "${SEAFILE_ADDRESS}" \
     -p "${SEAFILE_PORT}" \
@@ -59,7 +60,7 @@ setup_mysql() {
     -u "${MYSQL_USER}" \
     -w "${MYSQL_USER_PASSWORD}" \
     -q "${MYSQL_USER_HOST:-"%"}" \
-    ${OPTIONAL_PARMS}
+    ${OPTIONAL_PARMS}"
 
   setup_seahub
   move_and_link
@@ -68,11 +69,11 @@ setup_mysql() {
 setup_sqlite() {
   echo "setup_sqlite"
   # Setup Seafile
-  ${INSTALLPATH}/setup-seafile.sh auto \
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/setup-seafile.sh auto \
     -n "${SEAFILE_NAME}" \
     -i "${SEAFILE_ADDRESS}" \
     -p "${SEAFILE_PORT}" \
-    -d "${SEAFILE_DATA_DIR}"
+    -d "${SEAFILE_DATA_DIR}""
 
   setup_seahub
   move_and_link
@@ -80,28 +81,20 @@ setup_sqlite() {
 
 setup_seahub() {
   # Setup Seahub
-  export LANG='en_US.UTF-8'
-  export LC_ALL='en_US.UTF-8'
-  export CCNET_CONF_DIR="${BASEPATH}/ccnet"
-  export SEAFILE_CONF_DIR="${SEAFILE_DATA_DIR}"
-  export SEAFILE_CENTRAL_CONF_DIR="${BASEPATH}/conf"
-
-  export PYTHONPATH=${INSTALLPATH}/seafile/lib/python2.6/site-packages:${INSTALLPATH}/seafile/lib64/python2.6/site-packages:${INSTALLPATH}/seahub:${INSTALLPATH}/seahub/thirdpart:${PYTHONPATH:-}
-  export PYTHONPATH=${INSTALLPATH}/seafile/lib/python2.7/site-packages:${INSTALLPATH}/seafile/lib64/python2.7/site-packages:$PYTHONPATH
 
   # From https://github.com/haiwen/seafile-server-installer-cn/blob/master/seafile-server-ubuntu-14-04-amd64-http
   sed -i 's/= ask_admin_email()/= '"\"${SEAFILE_ADMIN}\""'/' ${INSTALLPATH}/check_init_admin.py
   sed -i 's/= ask_admin_password()/= '"\"${SEAFILE_ADMIN_PW}\""'/' ${INSTALLPATH}/check_init_admin.py
 
-  ${INSTALLPATH}/seafile.sh start
+  control_seafile "start"
 
-  python ${INSTALLPATH}/check_init_admin.py
+  gosu seafile bash -c ". /tmp/seafile.env; env; python ${INSTALLPATH}/check_init_admin.py"
 }
 
 move_and_link() {
   # Stop Seafile/hub instances if running
-  ${INSTALLPATH}/seahub.sh stop
-  ${INSTALLPATH}/seafile.sh stop
+  control_seahub "stop"
+  control_seafile "stop"
 
   for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data" 
   do
@@ -128,6 +121,7 @@ move_and_link() {
   then
     ln -s ${SH_DB_DIR}/seahub.db ${BASEPATH}/seahub.db
   fi
+  chown -R seafile:seafile ${DATADIR}/
 }
 
 keep_in_foreground() {
@@ -144,6 +138,26 @@ keep_in_foreground() {
     done
     sleep 5
   done
+}
+
+prepare_env() {
+  cat << _EOF_ >> /tmp/seafile.env
+  export LANG='en_US.UTF-8'
+  export LC_ALL='en_US.UTF-8'
+  export CCNET_CONF_DIR="${BASEPATH}/ccnet"
+  export SEAFILE_CONF_DIR="${SEAFILE_DATA_DIR}"
+  export SEAFILE_CENTRAL_CONF_DIR="${BASEPATH}/conf"
+  export PYTHONPATH=${INSTALLPATH}/seafile/lib/python2.6/site-packages:${INSTALLPATH}/seafile/lib64/python2.6/site-packages:${INSTALLPATH}/seahub:${INSTALLPATH}/seahub/thirdpart:${INSTALLPATH}/seafile/lib/python2.7/site-packages:${INSTALLPATH}/seafile/lib64/python2.7/site-packages:${PYTHONPATH:-}
+
+_EOF_
+}
+
+control_seafile() {
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seafile.sh "$@""
+}
+
+control_seahub() {
+  gosu seafile bash -c ". /tmp/seafile.env; ${INSTALLPATH}/seahub.sh "$@""
 }
 
 
@@ -163,6 +177,7 @@ SEAFILE_DATA_DIR=${SEAFILE_DATA_DIR:-"${DATADIR}/seafile-data"}
 SEAFILE_PORT=${SEAFILE_PORT:-8082}
 SEAHUB_DB_DIR=${SEAHUB_DB_DIR:-}
 
+prepare_env
 
 trap trapped SIGINT SIGTERM
 case $MODE in
