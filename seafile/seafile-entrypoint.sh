@@ -24,23 +24,29 @@ run_seafile() {
   # Try an initial setup on error
   if [ ${RET} -eq 255 ]
   then
-    set +u
-    # If $MYSQL_SERVER is set, we assume MYSQL setup is intended,
-    # otherwise sqlite
-    if [ -n "${MYSQL_SERVER}" ]
-    then
-      setup_mysql
-      control_seafile "start"
-    else
-      setup_sqlite
-      control_seafile "start"
-    fi
+    choose_setup
+    control_seafile "start"
   elif [ ${RET} -gt 0 ]
   then
     exit 1
   fi
   control_seahub "start"
   keep_in_foreground
+}
+
+choose_setup() {
+  set +u
+  # If $MYSQL_SERVER is set, we assume MYSQL setup is intended,
+  # otherwise sqlite
+  if [ -n "${MYSQL_SERVER}" ]
+  then
+    set -u
+    setup_mysql
+  else
+    set -u
+    setup_sqlite
+  fi
+
 }
 
 setup_mysql() {
@@ -98,7 +104,7 @@ move_and_link() {
 
   for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data" 
   do
-    if [ -e "${BASEPATH}/${SEADIR}" ]
+    if [ -e "${BASEPATH}/${SEADIR}" -a ! -L "${BASEPATH}/${SEADIR}" ]
     then
       cp -a ${BASEPATH}/${SEADIR} ${DATADIR}
       rm -rf "${BASEPATH}/${SEADIR}"
@@ -115,11 +121,11 @@ move_and_link() {
   # As this is normally in the root dir of seafile (/opt/haiwen)
   # SEAHUB_DB_DIR needs to be defined if it should be moved elsewhere under /seafile
   local SH_DB_DIR="${DATADIR}/${SEAHUB_DB_DIR}"
-  if [ -e "${BASEPATH}/seahub.db" ]
+  if [ -e "${BASEPATH}/seahub.db" -a ! -L "${BASEPATH}/seahub.db" ]
   then
     mv ${BASEPATH}/seahub.db ${SH_DB_DIR}/
   fi
-  if [ -e "${SH_DB_DIR}/seahub.db" ]
+  if [ -e "${SH_DB_DIR}/seahub.db" -a ! -L "${BASEPATH}/seahub.db" ]
   then
     ln -s ${SH_DB_DIR}/seahub.db ${BASEPATH}/seahub.db
   fi
@@ -170,17 +176,8 @@ control_seahub() {
 }
 
 
-while getopts ":m:e:" OPT
-do
-  case $OPT in
-    m)
-      MODE=${OPTARG}
-    ;;
-  esac
-done
-
 # Fill vars with defaults if empty
-MODE=${MODE:-"run"}
+MODE=${1:-"run"}
 
 SEAFILE_DATA_DIR=${SEAFILE_DATA_DIR:-"${DATADIR}/seafile-data"}
 SEAFILE_PORT=${SEAFILE_PORT:-8082}
@@ -201,5 +198,8 @@ case $MODE in
   ;;
   "setup_seahub")
     setup_seahub
+  ;;
+  "setup_only")
+    choose_setup
   ;;
 esac
