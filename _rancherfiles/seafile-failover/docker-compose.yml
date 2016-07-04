@@ -2,29 +2,20 @@ seafile:
   image: m3adow/seafile:dev
   env_file:
   - ./secrets.env
-  volumes:
-    - cloud-data:/seafile
-  volume_driver: convoy-gluster
+  #volumes:
+  #  - cloud-data2:/seafile
   external_links:
-  - 'galera/galera-lb:mysql'
+  - 'galera/galera-lb:mysql-server'
   labels:
     io.rancher.container.hostname_override: container_name
     io.rancher.container.pull_image: always
-    #io.rancher.sidekicks: setup-seafile
-
-#setup-seafile:
-#  extends: 
-#    service: seafile
-#  command: setup_only
-#  labels:
-#    io.rancher.container.start_once: true
 
 debugger:
   image: m3adow/nettools
   env_file:
   - ./secrets.env
-  volumes:
-    - cloud-data:/seafile
+  #volumes:
+  #  - cloud-data:/seafile
   volume_driver: convoy-gluster
   external_links:
   - 'galera/galera-lb:mysql-server'
