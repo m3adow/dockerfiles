@@ -1,0 +1,18 @@
+openvpn-data:
+  labels:
+    io.rancher.container.start_once: 'true'
+  image: busybox
+  entrypoint: /bin/true
+  volumes:
+  - /etc/openvpn
+
+
+openvpn:
+  image: kylemanna/openvpn:latest
+  volumes_from:
+  - openvpn-data
+  labels:
+    io.rancher.sidekicks: openvpn-data
+    io.rancher.pull_image: always
+  cap_add:
+  - NET_ADMIN
