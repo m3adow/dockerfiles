@@ -144,7 +144,7 @@ link_files() {
       # ls for debugging reasons
       ls -ld ${DATADIR}/${SEADIR}
       ls -lA ${DATADIR}/${SEADIR}
-      ln -s ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
+      ln -sf ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
   done
 
