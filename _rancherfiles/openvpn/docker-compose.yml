@@ -6,7 +6,6 @@ openvpn-data:
   volumes:
   - /etc/openvpn
 
-
 openvpn:
   image: kylemanna/openvpn:latest
   volumes_from:
@@ -16,3 +15,5 @@ openvpn:
     io.rancher.pull_image: always
   cap_add:
   - NET_ADMIN
+
+# OpenVPN ADD VOLUME?
