@@ -156,7 +156,6 @@ link_files() {
 }
 
 keep_in_foreground() {
-  # todo: pkill > ps -ef |grep
   # As there seems to be no way to let Seafile processes run in the foreground we 
   # need a foreground process. This has a dual use as a supervisor script because 
   # as soon as one process is not running, the command returns an exit code >0 
@@ -165,7 +164,7 @@ keep_in_foreground() {
   do
     for SEAFILE_PROC in "seafile-controller" "ccnet-server" "seaf-server" "gunicorn"
     do
-      ps -ef | grep -v "grep" | grep -q "${SEAFILE_PROC}"
+      pkill -0 ${SEAFILE_PROC} 
       sleep 1
     done
     sleep 5
