@@ -103,7 +103,7 @@ setup_seahub() {
 
   control_seafile "start"
 
-  gosu seafile bash -c ". /tmp/seafile.env; python ${INSTALLPATH}/check_init_admin.py"
+  gosu seafile bash -c ". /tmp/seafile.env; python -m trace -t ${INSTALLPATH}/check_init_admin.py"
 }
 
 move_and_link() {
