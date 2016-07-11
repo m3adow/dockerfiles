@@ -7,7 +7,7 @@ seafile:
     io.rancher.container.pull_image: always
   volumes_from:
   - seafile-setup
-  command: run_only
+  command: run
 
 seafile-setup:
   image: m3adow/seafile:dev
@@ -26,6 +26,7 @@ seafile-db:
   - ./secrets.env
   labels:
     io.rancher.container.pull_image: always
+
 debugger:
   image: m3adow/nettools
   env_file:
