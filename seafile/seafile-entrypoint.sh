@@ -61,6 +61,10 @@ choose_setup() {
 setup_mysql() {
   echo "setup_mysql"
 
+  # Wait for MySQL to boot up
+  $DOCKERIZE_TIMEOUT=${DOCKERIZE_TIMEOUT:-"60s"}
+  dockerize -timeout ${DOCKERIZE_TIMEOUT} -wait tcp://${MYSQL_SERVER}:${MYSQL_PORT:-3306}
+
   set +u
   OPTIONAL_PARMS="$([ -n "${MYSQL_ROOT_PASSWORD}" ] && printf '%s' "-r ${MYSQL_ROOT_PASSWORD}")"
   set -u
