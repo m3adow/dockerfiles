@@ -62,7 +62,7 @@ setup_mysql() {
   echo "setup_mysql"
 
   # Wait for MySQL to boot up
-  $DOCKERIZE_TIMEOUT=${DOCKERIZE_TIMEOUT:-"60s"}
+  DOCKERIZE_TIMEOUT=${DOCKERIZE_TIMEOUT:-"60s"}
   dockerize -timeout ${DOCKERIZE_TIMEOUT} -wait tcp://${MYSQL_SERVER}:${MYSQL_PORT:-3306}
 
   set +u
