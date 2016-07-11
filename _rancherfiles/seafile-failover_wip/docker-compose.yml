@@ -1,7 +1,0 @@
-seafile:
-  name: seafile
-  image: m3adow/seafile
-  volumes:
-  - cloud-data:/seafile
-  volume_driver: convoy-gluster
-

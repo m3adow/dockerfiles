@@ -1,0 +1,30 @@
+seafile:
+  image: m3adow/seafile:dev
+  env_file:
+  - ./secrets.env
+  labels:
+    io.rancher.sidekicks: seafile-setup
+    io.rancher.container.pull_image: always
+  volumes_from:
+  - seafile-setup
+  command: run
+
+seafile-setup:
+  image: m3adow/seafile:dev
+  env_file:
+  - ./secrets.env
+  volumes:
+  - /seafile
+  labels: 
+    io.rancher.container.pull_image: always
+    io.rancher.container.start_once: true
+  command: setup_only
+
+seafile-db:
+  image: mariadb:latest
+  env_file:
+  - ./secrets.env
+  labels:
+    io.rancher.container.pull_image: always
+  volumes:
+  - /var/lib/mysql
