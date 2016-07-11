@@ -107,7 +107,8 @@ setup_seahub() {
 
   control_seafile "start"
 
-  gosu seafile bash -c ". /tmp/seafile.env; python -m trace -t ${INSTALLPATH}/check_init_admin.py | tee -a /seafile/check_init_admin.log"
+  gosu seafile bash -c ". /tmp/seafile.env; python -t ${INSTALLPATH}/check_init_admin.py"
+  # gosu seafile bash -c ". /tmp/seafile.env; python -m trace -t ${INSTALLPATH}/check_init_admin.py | tee -a /seafile/check_init_admin.log"
 }
 
 move_and_link() {
@@ -166,9 +167,9 @@ keep_in_foreground() {
   # leading to a script abortion thanks to "set -e".
   while true
   do
-    for SEAFILE_PROC in "seafile-controller" "ccnet-server" "seaf-server" "gunicorn"
+    for SEAFILE_PROC in "seafile-control" "ccnet-server" "seaf-server" "gunicorn"
     do
-      pkill -0 ${SEAFILE_PROC} 
+      pkill -0 -f "${SEAFILE_PROC}"
       sleep 1
     done
     sleep 5
