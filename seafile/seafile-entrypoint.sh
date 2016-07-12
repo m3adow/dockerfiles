@@ -37,7 +37,8 @@ autorun() {
 run_only() {
   local SH_DB_DIR="${DATADIR}/${SEAHUB_DB_DIR}"
   # Linking must always be done
-  link_files "${SH_DB_DIR}"
+  # link_files "${SH_DB_DIR}"
+  move_and_link
   control_seafile "start"
   control_seahub "start"
   keep_in_foreground

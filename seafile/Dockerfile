@@ -16,6 +16,7 @@ RUN useradd -d /seafile -M -s /bin/bash -c "Seafile User" seafile \
   && chown -R seafile:seafile /seafile /opt/haiwen
 
 COPY ["seafile-entrypoint.sh", "/usr/local/bin/"]
+VOLUME ["/seafile"]
 
 EXPOSE 8000 8082
 
