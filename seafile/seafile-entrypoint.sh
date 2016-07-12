@@ -139,6 +139,16 @@ move_files() {
   then
     mv ${BASEPATH}/seahub.db ${1}/
   fi
+
+  if [ -n "${DEBUG}" ]
+  then 
+    cp -a ${BASEPATH}/logs ${DATADIR} || {
+      mkdir -p ${DATADIR}/logs ${BASEPATH}/runtime
+      chown seafile:seafile ${BASEPATH}/runtime
+    }
+    cp -a ${BASEPATH}/runtime/error.log ${DATADIR}/error.log || touch ${DATADIR}/error.log ${BASEPATH}/runtime/error.log
+    cp -a ${BASEPATH}/runtime/access.log ${DATADIR}/access.log || touch ${DATADIR}/access.log ${BASEPATH}/runtime/access.log
+  fi
 }
 
 link_files() {
@@ -156,6 +166,13 @@ link_files() {
   if [ -e "${SH_DB_DIR}/seahub.db" -a ! -L "${BASEPATH}/seahub.db" ]
   then
     ln -s ${1}/seahub.db ${BASEPATH}/seahub.db
+  fi
+
+  if [ -n "${DEBUG}" ]
+  then 
+    ln -sf ${DATADIR}/logs ${BASEPATH}/logs
+    ln -sf ${DATADIR}/error.log ${BASEPATH}/runtime/error.log
+    ln -sf ${DATADIR}/access.log ${BASEPATH}/runtime/access.log
   fi
 
 }
@@ -205,6 +222,7 @@ control_seahub() {
 
 # Fill vars with defaults if empty
 MODE=${1:-"run"}
+DEBUG=${DEBUG:-}
 
 SEAFILE_DATA_DIR=${SEAFILE_DATA_DIR:-"${DATADIR}/seafile-data"}
 SEAFILE_PORT=${SEAFILE_PORT:-8082}
