@@ -145,9 +145,16 @@ move_files() {
     cp -a ${BASEPATH}/logs ${DATADIR} || {
       mkdir -p ${DATADIR}/logs ${BASEPATH}/runtime
       chown seafile:seafile ${BASEPATH}/runtime
+      create_n_own "${BASEPATH}/runtime" "seafile:seafile"
     }
-    cp -a ${BASEPATH}/runtime/error.log ${DATADIR}/error.log || touch ${DATADIR}/error.log ${BASEPATH}/runtime/error.log
-    cp -a ${BASEPATH}/runtime/access.log ${DATADIR}/access.log || touch ${DATADIR}/access.log ${BASEPATH}/runtime/access.log
+    cp -a ${BASEPATH}/runtime/error.log ${DATADIR}/error.log || {
+      touch ${DATADIR}/error.log
+      create_n_own "${BASEPATH}/runtime/" "seafile:seafile"
+    }
+    cp -a ${BASEPATH}/runtime/access.log ${DATADIR}/access.log || {
+      touch ${DATADIR}/access.log
+      create_n_own "${BASEPATH}/runtime/" "seafile:seafile"
+    }
   fi
 }
 
@@ -157,8 +164,8 @@ link_files() {
     if [ -e "${DATADIR}/${SEADIR}" ]
     then
       # ls for debugging reasons
-      ls -ld ${DATADIR}/${SEADIR}
-      ls -lA ${DATADIR}/${SEADIR}
+      # ls -ld ${DATADIR}/${SEADIR}
+      # ls -lA ${DATADIR}/${SEADIR}
       ln -sf ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
   done
@@ -175,6 +182,11 @@ link_files() {
     ln -sf ${DATADIR}/access.log ${BASEPATH}/runtime/access.log
   fi
 
+}
+
+create_n_own() {
+  mkdir -p "${1}"
+  chown ${3:-} "${2}" "${1}"
 }
 
 keep_in_foreground() {
