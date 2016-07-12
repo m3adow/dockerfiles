@@ -3,7 +3,7 @@ seafile:
   env_file:
   - ./secrets.env
   labels:
-    io.rancher.sidekicks: seafile-setup
+    io.rancher.sidekicks: seafile-setup, debugger
     io.rancher.container.pull_image: always
   volumes_from:
   - seafile-setup
@@ -26,5 +26,14 @@ seafile-db:
   - ./secrets.env
   labels:
     io.rancher.container.pull_image: always
-  volumes:
-  - /var/lib/mysql
+
+debugger:
+  image: m3adow/nettools
+  env_file:
+  - ./secrets.env
+  volumes_from:
+  - seafile-setup
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  stdin_open: true
