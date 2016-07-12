@@ -167,7 +167,7 @@ link_files() {
       # ls for debugging reasons
       # ls -ld ${DATADIR}/${SEADIR}
       # ls -lA ${DATADIR}/${SEADIR}
-      ln -sf ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
+      ln -sfT ${DATADIR}/${SEADIR} ${BASEPATH}/${SEADIR}
     fi
   done
 
@@ -178,9 +178,9 @@ link_files() {
 
   if [ -n "${DEBUG}" ]
   then 
-    ln -sf ${DATADIR}/logs ${BASEPATH}/logs
-    ln -sf ${DATADIR}/error.log ${BASEPATH}/runtime/error.log
-    ln -sf ${DATADIR}/access.log ${BASEPATH}/runtime/access.log
+    ln -sfT ${DATADIR}/logs ${BASEPATH}/logs
+    ln -sfT ${DATADIR}/error.log ${BASEPATH}/runtime/error.log
+    ln -sfT ${DATADIR}/access.log ${BASEPATH}/runtime/access.log
   fi
 
 }
