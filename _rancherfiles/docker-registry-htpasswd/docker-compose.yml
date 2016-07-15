@@ -1,0 +1,32 @@
+registry-lb:
+  image: rancher/load-balancer-service
+  labels:
+    io.rancher.scheduler.global: 'true'
+  ports:
+  - 5000:5000/tcp
+  links:
+  - registry:registry
+
+registry:
+  image: registry:2
+  env_file:
+  - ./secrets.env
+  environment:
+    REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+  volumes_from:
+  - registry-data
+  labels:
+    io.rancher.sidekicks: registry-data
+
+registry-data:
+  image: busybox
+  net: "none"
+  env_file:
+  - ./secrets.env
+  # Sleep to prevent the container being in a "stopped" state instead of "started once"
+  command: sh -c "echo "$${SECURE_BASE64}" | base64 -d | tar -C /secure -xzvf - && ls -l /secure && sleep 30"
+  volumes:
+  - /secure
+  - /var/lib/registry
+  labels:
+    io.rancher.container.start_once: 'true'
