@@ -24,6 +24,10 @@ RUN cd /usr/local/bin \
   && mv gosu-$(dpkg --print-architecture) gosu \
   && chmod +x gosu \
   && rm -f SHA256SUMS
+RUN cd /usr/local/bin \
+  && curl -sL $(curl -s https://api.github.com/repos/jwilder/dockerize/releases/latest \
+    | grep -E 'browser_.*amd64' | cut -d\" -f4) | tar xzv \
+  && chmod +x dockerize
 RUN DEBIAN_FRONTEND=noninteractive apt-get purge -y curl ca-certificates \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* \
