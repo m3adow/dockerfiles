@@ -5,7 +5,17 @@ set -o pipefail
 
 DATADIR=${DATADIR:-"/seafile"}
 BASEPATH=${BASEPATH:-"/opt/haiwen"}
-INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1 ${BASEPATH} | grep -E '^seafile-server-[0-9.-]+')"}
+USE_PRO=${USE_PRO:-false}
+
+if [ "$USE_PRO" = true ] ; then
+  echo "Using Professional Edition..."
+  INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1vr ${BASEPATH} | grep -E -m 1 '^seafile-pro-server-[0-9.-]+')"}
+else
+  echo "Using Community Edition..."
+  INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1vr ${BASEPATH} | grep -E -m 1  '^seafile-server-[0-9.-]+')"}
+fi
+
+echo "Installation path: $INSTALLPATH"
 
 trapped() {
   control_seahub "stop"
