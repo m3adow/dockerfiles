@@ -29,7 +29,12 @@ autorun() {
   then
     exit 1
   fi
-  control_seahub "start"
+  if [ ${SEAFILE_FASTCGI:-} ]
+  then
+    control_seahub "start-fastcgi"
+  else
+    control_seahub "start"
+  fi
   keep_in_foreground
 }
 
