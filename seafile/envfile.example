@@ -10,3 +10,5 @@ SEAFILE_ADMIN_PW=LoremIpsum
 #MYSQL_USER_HOST=%
 #MYSQL_ROOT_PASSWORD=12345
 
+# Use this to install the Professional edition of Seafile
+#USE_PRO=true

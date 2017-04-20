@@ -6,6 +6,7 @@ Seafile Docker container based on Ubuntu
 * Running under dumb-init to prevent the "child reaping problem"
 * Configurable to run with MySQL/MariaDB or SQLite
 * Auto-setup at initial run
+* Allows usage of Community or Professional Edition
 
 ### Quickstart
 
@@ -75,6 +76,9 @@ If you want to use MySQL/MariaDB, the following variables are needed:
 **Optional ENV variables for auto setup with MySQL/MariaDB**
 * **MYSQL_USER_HOST**: Host the MySQL User is allowed from (default: '%')
 * **MYSQL_ROOT_PASSWORD**: If you haven't set up the MySQL tables by yourself, Seafile will do it for you when being provided with the MySQL root password
+
+**Optional ENV variable to use the Professional edition of Seafile**
+* **USE_PRO**: Download and run Pro (default: false)
 
 If you plan on omitting /seafile as a volume and mount the subdirectories instead, you'll need to additionally specify `SEAHUB_DB_DIR` which containes the subdirectory of /seafile the *seahub.db* file shall be put in.
 

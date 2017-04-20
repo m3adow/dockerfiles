@@ -5,7 +5,17 @@ set -o pipefail
 
 DATADIR=${DATADIR:-"/seafile"}
 BASEPATH=${BASEPATH:-"/opt/haiwen"}
-INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1 ${BASEPATH} | grep -E '^seafile-server-[0-9.-]+')"}
+USE_PRO=${USE_PRO:-false}
+
+if [ "$USE_PRO" = true ] ; then
+  echo "Using Professional Edition..."
+  INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1vr ${BASEPATH} | grep -E -m 1 '^seafile-pro-server-[0-9.-]+')"}
+else
+  echo "Using Community Edition..."
+  INSTALLPATH=${INSTALLPATH:-"${BASEPATH}/$(ls -1vr ${BASEPATH} | grep -E -m 1  '^seafile-server-[0-9.-]+')"}
+fi
+
+echo "Installation path: $INSTALLPATH"
 
 trapped() {
   control_seahub "stop"
@@ -130,7 +140,7 @@ move_and_link() {
 }
 
 move_files() {
-  for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data" 
+  for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data"
   do
     if [ -e "${BASEPATH}/${SEADIR}" -a ! -L "${BASEPATH}/${SEADIR}" ]
     then
@@ -146,7 +156,7 @@ move_files() {
 }
 
 link_files() {
-  for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data" 
+  for SEADIR in "ccnet" "conf" "seafile-data" "seahub-data"
   do
     if [ -e "${DATADIR}/${SEADIR}" ]
     then
@@ -165,9 +175,9 @@ link_files() {
 }
 
 keep_in_foreground() {
-  # As there seems to be no way to let Seafile processes run in the foreground we 
-  # need a foreground process. This has a dual use as a supervisor script because 
-  # as soon as one process is not running, the command returns an exit code >0 
+  # As there seems to be no way to let Seafile processes run in the foreground we
+  # need a foreground process. This has a dual use as a supervisor script because
+  # as soon as one process is not running, the command returns an exit code >0
   # leading to a script abortion thanks to "set -e".
   while true
   do
@@ -219,7 +229,7 @@ prepare_env
 trap trapped SIGINT SIGTERM
 case $MODE in
   "autorun" | "run")
-    autorun 
+    autorun
   ;;
   "setup" | "setup_mysql")
     setup_mysql
