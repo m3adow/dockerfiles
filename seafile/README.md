@@ -35,7 +35,7 @@ docker run -d -e SEAFILE_NAME=Seaflail \
 ### Overview
 
 Filetree:
-
+```
 /seafile/
 |-- ccnet
 |-- conf
@@ -51,6 +51,7 @@ Filetree:
     |-- seafile-server-5.1.3
     |-- seafile-server-latest -> seafile-server-5.1.3
     `-- seahub-data -> /seafile/seahub-data
+```
 
 All important data is stored under /seafile, so you should be mounting a volume there (recommended) or at the respective subdirectories. This will not happen automatically!
 There are a plethora of environment variables which might be needed for your setup. I recommend using Dockers `--env-file` option.
