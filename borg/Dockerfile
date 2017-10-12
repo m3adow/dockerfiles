@@ -1,6 +1,6 @@
 FROM ubuntu
 
-ENV BORG_LATEST_SCRIPT_URL=https://gist.githubusercontent.com/m3adow/d3a4479742c56fe77e3cf6fc0d405e8e/raw/borg-latest.sh \
+ENV BORG_LATEST_SCRIPT_URL=https://gist.github.com/m3adow/d3a4479742c56fe77e3cf6fc0d405e8e/raw/borg-latest.sh \
     BORG_PATH=/usr/local/bin/borg
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
