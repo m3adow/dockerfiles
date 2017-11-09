@@ -13,6 +13,7 @@ RUN useradd -d /seafile -M -s /bin/bash -c "Seafile User" seafile \
   && curl -sL $(curl -sL https://www.seafile.com/en/download/ \
     | grep -oE 'https://.*seafile-server.*x86-64.tar.gz'|sort -r|head -1) \
     | tar -C /opt/haiwen/ -xz \
+  && ln -s /opt/haiwen/seafile-server-* /opt/haiwen/seafile-server-latest \
   && chown -R seafile:seafile /seafile /opt/haiwen
 
 COPY ["seafile-entrypoint.sh", "/usr/local/bin/"]
