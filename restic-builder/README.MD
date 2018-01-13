@@ -5,7 +5,8 @@ It will compile the newest restic version on every run and output it on STDOUT. 
 it is like this:
 
 ```bash
-docker run --rm m3adow/restic-builder > ~/bin/restic && docker rmi m3adow/restic-builder
+docker run --rm m3adow/restic-builder > ~/bin/restic && docker rmi m3adow/restic-builder \
+  && chmod +x ~/bin/restic
 ```
 
 This is very useful to keep restic up to date on systems without official packages without need to permanently install
