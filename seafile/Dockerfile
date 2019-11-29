@@ -1,10 +1,11 @@
 FROM m3adow/ubuntu_dumb-init_gosu:latest
-MAINTAINER Till Wiese <mail-github.com@till-wiese.de>
+LABEL maintainer="Till Wiese <mail-github.com@till-wiese.de>"
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-  && apt-get install -y python2.7 libpython2.7 python-mysqldb \
-      python-setuptools python-imaging python-ldap sqlite3 \
-      python-memcache curl \
+  && apt-get install -y --no-install-recommends \
+      python python-pil python-ldap python-urllib3 \
+      python-setuptools python-mysqldb python-memcache \
+      python-requests curl \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
