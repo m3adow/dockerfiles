@@ -5,7 +5,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
   && apt-get install -y --no-install-recommends \
       python python-pil python-ldap python-urllib3 \
       python-setuptools python-mysqldb python-memcache \
-      python-requests curl \
+      python-requests curl sqlite3 \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
